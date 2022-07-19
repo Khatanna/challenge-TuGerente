@@ -11,13 +11,13 @@ import {
 const router = Router();
 
 router.get('/', getAllHotels);
-router.get('/:name', getHotelByName);
+router.get('/', getHotelByName);
 router.get('/:id', getHotelById);
 
 router.post('/', createHotel);
 
-router.put('/', updateHotel);
+router.put('/:id', updateHotel);
 
-router.delete('/', deleteHotel);
+router.delete('/:id', deleteHotel);
 
 export default router;
