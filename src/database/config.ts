@@ -1,5 +1,7 @@
+import { config } from 'dotenv';
 import { Dialect } from 'sequelize/types';
 import path from 'path';
+config();
 
 const {
   DB_USERNAME,

@@ -6,10 +6,11 @@ import {
   AutoIncrement,
   IsEmail,
   AllowNull,
-  BelongsToMany
+  BelongsToMany,
+  Unique
 } from 'sequelize-typescript';
 import { Reservation } from './Reservation';
-import { Room } from './Room';
+import bcrypt from 'bcryptjs';
 
 @Table({
   timestamps: false,
@@ -21,6 +22,7 @@ export class User extends Model {
   @Column
   id!: number;
 
+  @Unique
   @AllowNull(false)
   @IsEmail
   @Column
@@ -28,7 +30,10 @@ export class User extends Model {
 
   @AllowNull(false)
   @Column
-  password!: string;
+  set password(value: string) {
+    const encryptedPassword: string = bcrypt.hashSync(value, 10);
+    this.setDataValue('password', encryptedPassword);
+  }
 
   @BelongsToMany(() => User, () => Reservation)
   users!: User[];

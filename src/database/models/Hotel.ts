@@ -5,7 +5,8 @@ import {
   PrimaryKey,
   AutoIncrement,
   AllowNull,
-  HasMany
+  HasMany,
+  Unique
 } from 'sequelize-typescript';
 import { Room } from './Room';
 
@@ -19,6 +20,7 @@ export class Hotel extends Model {
   @Column
   id!: number;
 
+  @Unique
   @AllowNull(false)
   @Column
   name!: string;
