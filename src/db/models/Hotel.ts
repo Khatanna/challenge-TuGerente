@@ -2,31 +2,31 @@ import {
   Table,
   Column,
   Model,
-  DataType,
-  AllowNull,
-  Default,
   PrimaryKey,
   AutoIncrement,
+  AllowNull,
   HasMany
 } from 'sequelize-typescript';
+import { Room } from './Room';
 
 @Table({
   timestamps: false,
-  tableName: 'Reserva'
+  tableName: 'Hotel'
 })
-export class Reserva extends Model {
+export class Hotel extends Model {
   @PrimaryKey
   @AutoIncrement
   @Column
   id!: number;
 
-  @Default('pending')
   @AllowNull(false)
-  @Column({
-    type: DataType.ENUM('pending', 'paid', 'deleted')
-  })
-  state!: string;
-
   @Column
-  date!: Date;
+  name!: string;
+
+  @AllowNull(false)
+  @Column
+  direction!: string;
+
+  @HasMany(() => Room)
+  rooms!: Room[];
 }
