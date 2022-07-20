@@ -8,12 +8,3 @@ import { StatusCodes } from 'http-status-codes';
 
 const { OK, CREATED, CONFLICT, NOT_FOUND } = StatusCodes;
 const { describe, before, beforeEach, it, after } = mocha;
-
-describe('[rooms] route', () => {
-  before(async () => {
-    await sequelize.sync({ force: true });
-  });
-  after(async () => {
-    // await sequelize.close();
-  });
-});

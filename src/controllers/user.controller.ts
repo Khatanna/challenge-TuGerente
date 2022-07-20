@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { User } from '../database/models/User';
 import { StatusCodes } from 'http-status-codes';
+import { UserLogged } from '../types';
 
 const { OK, CREATED, CONFLICT, NOT_FOUND } = StatusCodes;
 
@@ -146,4 +147,17 @@ export const deleteUser = async (
   } catch (error) {
     next(error);
   }
+};
+
+export const getUserProfile = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { id } = req.user as UserLogged;
+  const user = await User.findByPk(id);
+  res.json({
+    user,
+    token: req.query.secret_token
+  });
 };

@@ -8,8 +8,7 @@ const { OK, BAD_REQUEST } = StatusCodes;
 
 router.get('/', (_, res) => {
   res.status(OK).json({
-    status: OK,
-    message: 'Welcome to the API [Disney]'
+    status: OK
   });
 });
 

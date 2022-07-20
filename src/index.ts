@@ -14,12 +14,3 @@ sequelize
     });
   })
   .catch(console.log);
-
-/**
-  *     Reserva.create({
-      date: new Date()
-    })
-      .then((reserva) => reserva.toJSON())
-      .then(console.log)
-      .catch(console.log);
-   */
