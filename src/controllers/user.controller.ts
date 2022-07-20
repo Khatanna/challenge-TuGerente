@@ -212,7 +212,38 @@ export const getUserProfile = async (
   });
 };
 
-export const deleteReservationUser = async (
+export const createReservation = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { userId } = req.params;
+    const { state, daysOfStay, reservePrice, roomId } = req.body;
+    const user = await User.findByPk(userId);
+
+    if (user) {
+      const reservation = await Reservation.create({
+        state,
+        daysOfStay,
+        userId,
+        reservePrice,
+        roomId
+      });
+
+      res.status(CREATED).send({
+        reservation,
+        message: 'reservation created successfully'
+      });
+    } else {
+      res.status(NOT_FOUND).send({
+        message: 'user not found'
+      });
+    }
+  } catch (error) {}
+};
+
+export const deleteReservation = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -242,7 +273,7 @@ export const deleteReservationUser = async (
   } catch (error) {}
 };
 
-export const updateReservationUser = async (
+export const updateReservation = async (
   req: Request,
   res: Response,
   next: NextFunction

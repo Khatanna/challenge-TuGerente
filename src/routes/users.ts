@@ -8,8 +8,9 @@ import {
   getUserById,
   updateUser,
   getUserProfile,
-  deleteReservationUser,
-  updateReservationUser
+  deleteReservation,
+  updateReservation,
+  createReservation
 } from '../controllers/user.controller';
 import { isAuth } from '../controllers/auth.controller';
 
@@ -21,11 +22,12 @@ router.get('/', getUserByEmail);
 router.get('/:id', getUserById);
 
 router.post('/', createUser);
+router.post('/reservations/:userId', createReservation);
 
 router.put('/:id', updateUser);
-router.put('/reservations/:userId/:reservationId', updateReservationUser);
+router.put('/reservations/:userId/:reservationId', updateReservation);
 
 router.delete('/:id', deleteUser);
-router.delete('/reservations/:userId/:reservationId', deleteReservationUser);
+router.delete('/reservations/:userId/:reservationId', deleteReservation);
 
 export default router;

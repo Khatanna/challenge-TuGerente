@@ -136,7 +136,6 @@ export const deleteHotel = async (
     if (hotel) {
       await hotel.destroy();
       res.status(OK).send({
-        hotel,
         message: 'hotel deleted correctly'
       });
     } else {
@@ -212,6 +211,7 @@ export const updateRoom = async (
       if (room) {
         await room?.update({ roomNumber, capacity, numberOfBeds });
         res.status(OK).send({
+          room,
           message: 'room updated successfully'
         });
       } else {
