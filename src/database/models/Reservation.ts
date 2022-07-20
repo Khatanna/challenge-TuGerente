@@ -8,8 +8,12 @@ import {
   PrimaryKey,
   AutoIncrement,
   BelongsToMany,
-  ForeignKey
+  ForeignKey,
+  BelongsTo,
+  HasOne,
+  HasMany
 } from 'sequelize-typescript';
+import { RoomModel } from '../../types';
 import { Room } from './Room';
 import { User } from './User';
 
@@ -27,17 +31,31 @@ export class Reservation extends Model {
   @Column({
     type: DataType.ENUM('pending', 'paid', 'deleted')
   })
-  state!: string;
+  set state(value: string) {
+    this.setDataValue('state', value.toLowerCase());
+  }
+
+  @AllowNull(false)
+  @ForeignKey(() => User)
+  @Column({ field: 'user_id' })
+  userId!: number;
+
+  @AllowNull(false)
+  @Column({ field: 'reserve_price' })
+  reservePrice!: number;
 
   @AllowNull(false)
   @Column({ field: 'days_of_stay' })
   daysOfStay!: number;
 
-  @ForeignKey(() => User)
-  @Column({ field: 'user_id' })
-  userId!: number;
+  @BelongsTo(() => User)
+  user!: User;
 
+  @AllowNull(false)
   @ForeignKey(() => Room)
   @Column({ field: 'room_id' })
   roomId!: number;
+
+  @BelongsTo(() => Room)
+  room!: Room<RoomModel>;
 }

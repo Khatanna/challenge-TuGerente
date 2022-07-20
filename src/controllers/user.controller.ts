@@ -2,6 +2,9 @@ import { Request, Response, NextFunction } from 'express';
 import { User } from '../database/models/User';
 import { StatusCodes } from 'http-status-codes';
 import { UserLogged } from '../types';
+import { Reservation } from '../database/models/Reservation';
+import { Room } from '../database/models/Room';
+import { Op } from 'sequelize';
 
 const { OK, CREATED, CONFLICT, NOT_FOUND } = StatusCodes;
 
@@ -60,7 +63,21 @@ export const getUserById = async (
   try {
     const { id } = req.params;
 
-    const user = await User.findByPk(id);
+    const user = await User.findByPk(id, {
+      attributes: {
+        exclude: ['password']
+      },
+      include: {
+        where: {
+          state: {
+            [Op.not]: 'deleted'
+          }
+        },
+        attributes: ['id', 'state'],
+        model: Reservation,
+        include: [Room]
+      }
+    });
 
     if (user) {
       res.status(OK).send(user);
@@ -82,7 +99,26 @@ export const getUserByEmail = async (
   try {
     const { email } = req.query;
 
-    const user = await User.findOne({ where: { email } });
+    const user = await User.findOne({
+      attributes: {
+        exclude: ['password']
+      },
+      where: {
+        email
+      },
+      include: {
+        where: {
+          state: {
+            [Op.not]: 'deleted'
+          }
+        },
+        attributes: {
+          exclude: ['userId', 'roomId']
+        },
+        model: Reservation,
+        include: [Room]
+      }
+    });
 
     if (user) {
       res.send(user);
@@ -155,9 +191,85 @@ export const getUserProfile = async (
   next: NextFunction
 ) => {
   const { id } = req.user as UserLogged;
-  const user = await User.findByPk(id);
+  const user = await User.findByPk(id, {
+    attributes: {
+      exclude: ['password']
+    },
+    include: {
+      where: {
+        state: {
+          [Op.not]: 'deleted'
+        }
+      },
+      attributes: ['id', 'state'],
+      model: Reservation,
+      include: [Room]
+    }
+  });
   res.json({
     user,
     token: req.query.secret_token
   });
+};
+
+export const deleteReservationUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { reservationId, userId } = req.params;
+
+    // const user = await User.findByPk(userId);
+
+    const reservation = await Reservation.findOne({
+      where: {
+        userId,
+        id: reservationId
+      }
+    });
+
+    if (reservation) {
+      await reservation.update({ state: 'deleted' });
+      res.status(OK).send({
+        message: 'reservation deleted successfully'
+      });
+    } else {
+      res.status(NOT_FOUND).send({
+        message: 'reservation not found'
+      });
+    }
+  } catch (error) {}
+};
+
+export const updateReservationUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { roomId, reservePrice, daysOfStay } = req.body;
+    const { reservationId, userId } = req.params;
+
+    const reservation = await Reservation.findOne({
+      where: {
+        userId,
+        id: reservationId
+      }
+    });
+    if (reservation) {
+      await reservation.update({
+        roomId,
+        reservePrice,
+        daysOfStay
+      });
+      res.status(OK).send({
+        message: 'reservation updated successfully'
+      });
+    } else {
+      res.status(NOT_FOUND).send({
+        message: 'reservation not found'
+      });
+    }
+  } catch (error) {}
 };

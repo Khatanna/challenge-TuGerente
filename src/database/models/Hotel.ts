@@ -8,6 +8,7 @@ import {
   HasMany,
   Unique
 } from 'sequelize-typescript';
+import { RoomModel } from '../../types';
 import { Room } from './Room';
 
 @Table({
@@ -30,5 +31,5 @@ export class Hotel extends Model {
   direction!: string;
 
   @HasMany(() => Room)
-  rooms!: Room[];
+  rooms!: Room<RoomModel>[];
 }

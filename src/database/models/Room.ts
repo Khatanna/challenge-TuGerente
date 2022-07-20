@@ -6,18 +6,23 @@ import {
   PrimaryKey,
   BelongsTo,
   BelongsToMany,
-  ForeignKey
+  ForeignKey,
+  HasOne,
+  HasMany,
+  Unique
 } from 'sequelize-typescript';
 import { Hotel } from './Hotel';
 import { Reservation } from './Reservation';
 import { User } from './User';
+import { RoomModel } from '../../types';
 
 @Table({
   timestamps: false,
   tableName: 'Room'
 })
-export class Room extends Model {
+export class Room<RoomModel> extends Model {
   @PrimaryKey
+  @Unique
   @AllowNull(false)
   @Column({ field: 'room_number' })
   roomNumber!: number;
@@ -30,10 +35,6 @@ export class Room extends Model {
   @Column({ field: 'number_of_beds' })
   numberOfBeds!: number;
 
-  @AllowNull(false)
-  @Column({ field: 'reserve_price' })
-  reservePrice!: number;
-
   @ForeignKey(() => Hotel)
   @Column({ field: 'hotel_id' })
   hotelId!: number;
@@ -41,14 +42,6 @@ export class Room extends Model {
   @BelongsTo(() => Hotel)
   hotel!: Hotel;
 
-  @BelongsToMany(() => Room, () => Reservation)
-  rooms!: Room[];
+  @HasMany(() => Reservation)
+  rooms!: Reservation[];
 }
-
-// get name(): string {
-//   return 'My name is ' + this.getDataValue('name')
-// }
-
-// set name(value: string) {
-//   this.setDataValue('name', value)
-// }

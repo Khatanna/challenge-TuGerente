@@ -7,7 +7,9 @@ import {
   getUserByEmail,
   getUserById,
   updateUser,
-  getUserProfile
+  getUserProfile,
+  deleteReservationUser,
+  updateReservationUser
 } from '../controllers/user.controller';
 import { isAuth } from '../controllers/auth.controller';
 
@@ -21,7 +23,9 @@ router.get('/:id', getUserById);
 router.post('/', createUser);
 
 router.put('/:id', updateUser);
+router.put('/reservations/:userId/:reservationId', updateReservationUser);
 
 router.delete('/:id', deleteUser);
+router.delete('/reservations/:userId/:reservationId', deleteReservationUser);
 
 export default router;

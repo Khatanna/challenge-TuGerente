@@ -7,42 +7,72 @@ import { Reservation } from '../../src/database/models/Reservation';
 import { Room } from '../../src/database/models/Room';
 import { User } from '../../src/database/models/User';
 import { StatusCodes } from 'http-status-codes';
+import { Hotel } from '../../src/database/models/Hotel';
 
 const { OK, CREATED, CONFLICT, NOT_FOUND } = StatusCodes;
-const { describe, before, beforeEach, it, after } = mocha;
+const { describe, before, beforeEach, it, after, xit } = mocha;
 
-describe('GET /reservatons', () => {
+describe('GET /reservations', () => {
   before(async () => {
     await sequelize.sync({ force: true });
-    await User.create({
+    const user = await User.create({
       email: 'user@gmail.com',
       password: '71264652'
     });
+    const hotel = await Hotel.create({
+      name: 'newHotel',
+      direction: 'directionOfHotel'
+    });
+    await Room.create({
+      roomNumber: 45,
+      capacity: 4,
+      numberOfBeds: 4,
+      reservePrice: 2500,
+      hotelId: hotel.id
+    });
+    await Room.create({
+      roomNumber: 15,
+      capacity: 4,
+      numberOfBeds: 4,
+      reservePrice: 2500,
+      hotelId: hotel.id
+    });
+    await Reservation.create({
+      state: 'paid',
+      daysOfStay: 14,
+      userId: user.id,
+      roomId: 45
+    });
+    await Reservation.create({
+      daysOfStay: 31,
+      userId: user.id,
+      roomId: 15
+    });
   });
-  it('return all users of database correctly', async () => {
-    const {
-      body: { users },
-      status
-    } = await request(app).get('/users');
-    const count = await User.count();
-    assert.isArray(users);
-    assert.equal(status, OK);
-    assert.equal(users.length, count);
+  xit('return all users of database correctly', async () => {
+    await User.findByPk(1, {
+      include: {
+        attributes: ['id', 'state'],
+        model: Reservation,
+        include: [Room]
+      }
+    });
+    assert.equal(1, 1);
   });
-  it('return user by id', async () => {
+  xit('return user by id', async () => {
     const { body, status } = await request(app).get('/users/1');
     const user = await User.findByPk(1);
     assert.equal(status, OK);
     assert.deepEqual(body, user?.toJSON());
   });
-  it('return an message of error if user not exist', async () => {
+  xit('return an message of error if user not exist', async () => {
     const { body, status } = await request(app).get('/users/15');
     assert.equal(status, NOT_FOUND);
     assert.deepEqual(body, {
       message: 'user not found'
     });
   });
-  it('return user by email', async () => {
+  xit('return user by email', async () => {
     const user = await User.findByPk(1);
     const { body, status } = await request(app).get('/users').query({
       email: 'user@gmail.com'
@@ -51,7 +81,7 @@ describe('GET /reservatons', () => {
     assert.equal(status, OK);
     assert.deepEqual(body, user?.toJSON());
   });
-  it('return an message of error if user not exist', async () => {
+  xit('return an message of error if user not exist', async () => {
     const { body, status } = await request(app).get('/users').query({
       email: 'user123@gmail.com'
     });
@@ -61,11 +91,11 @@ describe('GET /reservatons', () => {
     });
   });
 });
-describe('POST /users', () => {
+describe('POST /reservatons', () => {
   before(async () => {
     await sequelize.sync({ force: true });
   });
-  it('create a user if all fields are valid and complete correctly', async () => {
+  xit('create a user if all fields are valid and complete correctly', async () => {
     const { body, status } = await request(app).post('/users').send({
       email: 'user@gmail.com',
       password: '123456789'
@@ -75,7 +105,7 @@ describe('POST /users', () => {
     assert.equal(status, CREATED);
     assert.deepEqual(body, userOfDatabase?.toJSON());
   });
-  it('returns an error if the "email" field is missing', async () => {
+  xit('returns an error if the "email" field is missing', async () => {
     const { body, status } = await request(app).post('/users').send({
       password: '123456789'
     });
@@ -85,7 +115,7 @@ describe('POST /users', () => {
     });
     assert.equal(status, CONFLICT);
   });
-  it('returns an error if the "password" field is missing', async () => {
+  xit('returns an error if the "password" field is missing', async () => {
     const { body, status } = await request(app).post('/users').send({
       email: 'user@gmail.com'
     });
@@ -95,7 +125,7 @@ describe('POST /users', () => {
     });
     assert.equal(status, CONFLICT);
   });
-  it('returns an error if the fields is missing', async () => {
+  xit('returns an error if the fields is missing', async () => {
     const { body, status } = await request(app).post('/users');
 
     assert.deepEqual(body, {
@@ -103,7 +133,7 @@ describe('POST /users', () => {
     });
     assert.equal(status, CONFLICT);
   });
-  it('returns an error if user already exist', async () => {
+  xit('returns an error if user already exist', async () => {
     const { body, status } = await request(app).post('/users').send({
       email: 'user@gmail.com',
       password: '123456789'
@@ -115,7 +145,7 @@ describe('POST /users', () => {
     assert.equal(status, CONFLICT);
   });
 });
-describe('PUT /users', () => {
+describe('PUT /reservatons', () => {
   before(async () => {
     await sequelize.sync({ force: true });
     await User.create({
@@ -123,7 +153,7 @@ describe('PUT /users', () => {
       password: '71264652'
     });
   });
-  it('returns an message and user if updated user correctly', async () => {
+  xit('returns an message and user if updated user correctly', async () => {
     const {
       body: { message, user },
       status
@@ -135,7 +165,7 @@ describe('PUT /users', () => {
     assert.equal(message, 'user updated correctly');
     assert.deepEqual(user, userOfDatabase?.toJSON());
   });
-  it('returns an message of error if user not exist', async () => {
+  xit('returns an message of error if user not exist', async () => {
     const { body, status } = await request(app).put('/users/10').send({
       email: 'userUpdated@gmail.com'
     });
@@ -146,7 +176,7 @@ describe('PUT /users', () => {
     });
   });
 });
-describe('DELETE /users', () => {
+describe('DELETE /reservatons', () => {
   before(async () => {
     await sequelize.sync({ force: true });
     await User.create({
@@ -154,7 +184,7 @@ describe('DELETE /users', () => {
       password: '71264652'
     });
   });
-  it('returns an message and user if deleted user correctly', async () => {
+  xit('returns an message and user if deleted user correctly', async () => {
     const {
       body: { message, user },
       status
@@ -165,15 +195,12 @@ describe('DELETE /users', () => {
     assert.deepEqual(message, 'user deleted correctly');
     assert.isNull(userOfDatabase);
   });
-  it('returns an message of error if user not exist', async () => {
+  xit('returns an message of error if user not exist', async () => {
     const { body, status } = await request(app).delete('/users/10');
 
     assert.equal(status, NOT_FOUND);
     assert.deepEqual(body, {
       message: 'user not found'
     });
-  });
-  after(async () => {
-    await sequelize.close();
   });
 });

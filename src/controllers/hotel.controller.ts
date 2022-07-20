@@ -148,3 +148,119 @@ export const deleteHotel = async (
     next(error);
   }
 };
+
+export const createRoom = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params;
+    const { roomNumber, capacity, numberOfBeds } = req.body;
+    const hotel = await Hotel.findByPk(id);
+
+    if (hotel) {
+      const [room, created] = await Room.findOrCreate({
+        where: {
+          roomNumber
+        },
+        defaults: {
+          roomNumber,
+          capacity,
+          numberOfBeds,
+          hotelId: hotel.id
+        }
+      });
+      if (created) {
+        res.status(OK).send({
+          room,
+          message: 'room create successfully'
+        });
+      } else {
+        res.status(CONFLICT).send({
+          room,
+          message: 'room already exist'
+        });
+      }
+    } else {
+      res.status(NOT_FOUND).send({
+        message: 'hotel not found'
+      });
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateRoom = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id, roomId } = req.params;
+    const { roomNumber, capacity, numberOfBeds } = req.body;
+    const hotel = await Hotel.findByPk(id);
+
+    if (hotel) {
+      const room = await Room.findOne({
+        where: {
+          hotelId: hotel.id,
+          roomNumber: roomId
+        }
+      });
+      if (room) {
+        await room?.update({ roomNumber, capacity, numberOfBeds });
+        res.status(OK).send({
+          message: 'room updated successfully'
+        });
+      } else {
+        res.status(NOT_FOUND).send({
+          message: 'room not found'
+        });
+      }
+    } else {
+      res.status(NOT_FOUND).send({
+        message: 'hotel not found'
+      });
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteRoom = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id, roomId } = req.params;
+    const hotel = await Hotel.findByPk(id);
+
+    if (hotel) {
+      const room = await Room.findOne({
+        where: {
+          hotelId: hotel.id,
+          roomNumber: roomId
+        }
+      });
+      if (room) {
+        await room?.destroy();
+        res.status(OK).send({
+          message: 'room deleted successfully'
+        });
+      } else {
+        res.status(NOT_FOUND).send({
+          message: 'room not found'
+        });
+      }
+    } else {
+      res.status(NOT_FOUND).send({
+        message: 'hotel not found'
+      });
+    }
+  } catch (error) {
+    next(error);
+  }
+};

@@ -7,7 +7,8 @@ import {
   IsEmail,
   AllowNull,
   BelongsToMany,
-  Unique
+  Unique,
+  HasMany
 } from 'sequelize-typescript';
 import { Reservation } from './Reservation';
 import bcrypt from 'bcryptjs';
@@ -35,6 +36,6 @@ export class User extends Model {
     this.setDataValue('password', encryptedPassword);
   }
 
-  @BelongsToMany(() => User, () => Reservation)
-  users!: User[];
+  @HasMany(() => Reservation)
+  reservations!: Reservation[];
 }
